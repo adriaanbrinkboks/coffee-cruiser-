@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coffee Cruiser</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy-dark:   #1B2A4A;
+      --navy-mid:    #2E4A7A;
+      --gold:        #C9922A;
+      --gold-light:  #E0A83A;
+      --cream:       #FAF8F3;
+      --cream-dark:  #F0EBE0;
+      --text-dark:   #1B2A4A;
+      --text-mid:    #4A5568;
+      --text-light:  #8A9BB0;
+      --nav-height:  68px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: var(--nav-height);
+      background: var(--navy-dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      transition: transform 0.35s ease;
+    }
+
+    nav.hidden { transform: translateY(-100%); }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--cream);
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo-icon {
+      width: 22px; height: 26px;
+      flex-shrink: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #B5D4F4;
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--gold-light); }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--cream);
+      border-radius: 2px;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: var(--nav-height);
+      left: 0; right: 0;
+      background: var(--navy-dark);
+      padding: 1rem 2rem 1.5rem;
+      z-index: 99;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      color: #B5D4F4;
+      text-decoration: none;
+      font-size: 1rem;
+      padding: 0.5rem 0;
+      border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    }
+
+    /* Hero */
+    #home {
+      min-height: 100vh;
+      padding-top: var(--nav-height);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+    }
+
+    .hero-text { padding: 4rem 3rem 4rem 4rem; }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 4vw, 3.75rem);
+      font-weight: 700;
+      color: var(--navy-dark);
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-title em { font-style: italic; color: var(--gold); }
+
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--text-mid);
+      max-width: 400px;
+      margin-bottom: 2rem;
+      line-height: 1.8;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--cream);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.875rem 2rem;
+      border-radius: 4px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    .btn-secondary {
+      display: inline-block;
+      background: transparent;
+      color: var(--navy-dark);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.875rem 2rem;
+      border: 1.5px solid var(--navy-mid);
+      border-radius: 4px;
+      margin-left: 1rem;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover { background: var(--navy-dark); color: var(--cream); }
+
+    /* Hero Slideshow */
+    .hero-slideshow {
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .slide.active { opacity: 1; }
+
+    .slide img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .slide-dots {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 2;
+    }
+
+    .slide-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: background 0.3s;
+      border: none;
+    }
+
+    .slide-dot.active { background: var(--gold); }
+
+    /* Sections */
+    section { padding: 5rem 4rem; }
+
+    .section-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 700;
+      color: var(--navy-dark);
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+    }
+
+    /* About */
+    #about { background: var(--cream-dark); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .about-text p {
+      color: var(--text-mid);
+      margin-bottom: 1rem;
+      font-size: 0.975rem;
+    }
+
+    .about-image {
+      border-radius: 6px;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      margin-left: 1.5rem;
+    }
+
+    .about-image img { width: 100%; height: 100%; object-fit: cover; object-position: center 70%; }
+
+    /* Menu */
+    #menu { background: var(--cream); }
+
+    .menu-inner { max-width: 1100px; margin: 0 auto; }
+
+    .menu-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+      margin-top: 0;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .menu-item {
+      background: white;
+      border: 0.5px solid rgba(27,42,74,0.12);
+      border-radius: 6px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .menu-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    .menu-item span { font-size: 0.925rem; color: var(--text-dark); }
+
+    .menu-item-more {
+      grid-column: 1 / -1;
+      background: rgba(201,146,42,0.08);
+      border-color: rgba(201,146,42,0.3);
+      font-style: italic;
+    }
+
+    .menu-item-more span:last-child { color: var(--gold); font-style: italic; }
+
+    .menu-photo {
+      border-radius: 6px;
+      overflow: hidden;
+      height: 100%;
+      min-height: 300px;
+    }
+
+    .menu-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Events */
+    #events { background: var(--navy-dark); }
+
+    #events .section-eyebrow { color: var(--gold); }
+    #events .section-title { color: var(--cream); }
+
+    .events-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .events-sub {
+      color: #B5D4F4;
+      font-size: 0.975rem;
+      margin-bottom: 2rem;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .pricing-card {
+      background: rgba(255,255,255,0.06);
+      border: 0.5px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      padding: 1.75rem 1.5rem;
+    }
+
+    .pricing-card.featured { background: var(--gold); border-color: var(--gold); }
+
+    .pricing-cups {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing-card.featured .pricing-cups { color: rgba(250,248,243,0.7); }
+
+    .pricing-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 0.25rem;
+    }
+
+    .pricing-time { font-size: 0.8rem; color: var(--text-light); }
+    .pricing-card.featured .pricing-time { color: rgba(250,248,243,0.75); }
+
+    .extras-note {
+      color: #B5D4F4;
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+
+    .extras-note strong { color: var(--gold-light); }
+
+    .event-photo {
+      border-radius: 6px;
+      overflow: hidden;
+      height: 100%;
+      min-height: 400px;
+    }
+
+    .event-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Contact */
+    #contact { background: var(--cream-dark); }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 4rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .contact-info p { color: var(--text-mid); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+    .contact-photo {
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      height: 200px;
+    }
+
+    .contact-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+    .contact-detail {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+    }
+
+    .contact-detail-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--navy-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .contact-detail-icon svg {
+      width: 14px; height: 14px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .booking-form {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem 2.25rem;
+      border: 0.5px solid rgba(27,42,74,0.1);
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { margin-bottom: 1.25rem; }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      border: 1px solid rgba(27,42,74,0.2);
+      border-radius: 4px;
+      padding: 0.7rem 0.875rem;
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-dark);
+      background: var(--cream);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--navy-mid); }
+
+    .form-group textarea { height: 100px; resize: vertical; }
+
+    .form-submit {
+      width: 100%;
+      background: var(--gold);
+      color: var(--cream);
+      border: none;
+      border-radius: 4px;
+      padding: 0.875rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .form-submit:hover { background: var(--gold-light); }
+
+    /* Footer */
+    footer {
+      background: var(--navy-dark);
+      padding: 2rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      color: var(--cream);
+      font-size: 1.4rem;
+    }
+
+    .footer-note { font-size: 0.8rem; color: var(--text-light); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #home { grid-template-columns: 1fr; }
+      .hero-slideshow { height: 55vw; min-height: 280px; }
+      .hero-text { padding: 3rem 1.5rem 2rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      .menu-layout { grid-template-columns: 1fr; }
+      .events-layout { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr 1fr; }
+      section { padding: 3.5rem 1.5rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem; }
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      .btn-secondary { margin-left: 0; margin-top: 0.75rem; display: inline-block; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      nav { transition: none; }
+      .slide { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar">
+    <a href="#home" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Steam curls -->
+        <path d="M10 5 Q9 3 10.5 1.5 Q12 0 11 -1" stroke="#C9922A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+        <path d="M13 5 Q12 3 13.5 1.5 Q15 0 14 -1" stroke="#C9922A" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+        <!-- Cup saucer (ellipse) -->
+        <ellipse cx="12" cy="17" rx="7" ry="2" stroke="#C9922A" stroke-width="1.4" fill="none"/>
+        <!-- Cup body -->
+        <path d="M6 10 Q6 17 12 17 Q18 17 18 10" stroke="#C9922A" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        <line x1="6" y1="10" x2="18" y2="10" stroke="#C9922A" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      Coffee Cruiser
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#events">Events</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#about">About</a>
+    <a href="#menu">Menu</a>
+    <a href="#events">Events</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <!-- Home / Hero -->
+  <section id="home">
+    <div class="hero-text">
+      <p class="hero-eyebrow">Handcrafted Coffee</p>
+      <h1 class="hero-title">
+        Coffee from a<br><em>1960's Land Cruiser</em>
+      </h1>
+      <p class="hero-sub">
+        We bring the coffee to you, whether it's a weekend in the neighbourhood or a big event. Every cup made with care.
+      </p>
+      <a href="#contact" class="btn-primary">Book an Event</a>
+      <a href="#menu" class="btn-secondary">View Menu</a>
+    </div>
+
+    <div class="hero-slideshow" id="heroSlideshow">
+      <div class="slide active">
+        <img src="Hero1.jpeg" alt="Coffee Cruiser" />
+      </div>
+      <div class="slide">
+        <img src="Hero2.jpeg" alt="Coffee Cruiser" />
+      </div>
+      <div class="slide">
+        <img src="Hero3.JPG" alt="Coffee Cruiser" />
+      </div>
+      <div class="slide-dots">
+        <button class="slide-dot active" data-index="0"></button>
+        <button class="slide-dot" data-index="1"></button>
+        <button class="slide-dot" data-index="2"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-text">
+        <p class="section-eyebrow">Our Story</p>
+        <h2 class="section-title">Two students.<br>One Land Cruiser.</h2>
+        <p>Coffee Cruiser was born out of a love for coffee and community. Adriaan and Carl started grinding beans in April 2025 and haven't stopped since.</p>
+        <p>Most weekends we park the Land Cruiser in the neighbourhood and bring handcrafted coffee right to the people. We're not professional baristas; we're two students who love great coffee.</p>
+      </div>
+      <div class="about-image">
+        <img src="Cruiser.JPG" alt="The Coffee Cruiser Land Cruiser" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Menu -->
+  <section id="menu">
+    <div class="menu-inner">
+      <div class="menu-layout">
+        <div>
+          <p class="section-eyebrow">What we serve</p>
+          <h2 class="section-title">Our Menu</h2>
+          <div class="menu-grid">
+            <div class="menu-item"><span class="menu-dot"></span><span>Cappuccino</span></div>
+            <div class="menu-item"><span class="menu-dot"></span><span>Americano</span></div>
+            <div class="menu-item"><span class="menu-dot"></span><span>Flat White</span></div>
+            <div class="menu-item"><span class="menu-dot"></span><span>Mocha</span></div>
+            <div class="menu-item"><span class="menu-dot"></span><span>Cortado</span></div>
+            <div class="menu-item"><span class="menu-dot"></span><span>Lungo</span></div>
+            <div class="menu-item"><span class="menu-dot"></span><span>Hot Chocolate</span></div>
+            <div class="menu-item"><span class="menu-dot"></span><span>Tea</span></div>
+            <div class="menu-item menu-item-more"><span class="menu-dot"></span><span>& more; just ask!</span></div>
+          </div>
+        </div>
+        <div class="menu-photo">
+          <img src="Menu.JPG" alt="Coffee being made at Coffee Cruiser" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events & Pricing -->
+  <section id="events">
+    <div class="events-layout">
+      <div>
+        <p class="section-eyebrow">Large gatherings</p>
+        <h2 class="section-title">Events & Pricing</h2>
+        <p class="events-sub">
+          We bring the full Coffee Cruiser experience to your event: weddings, offices, schools, and more. Prepay for a set number of cups, and your guests drink freely.
+        </p>
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <p class="pricing-cups">50 Cups</p>
+            <p class="pricing-price">R1 650</p>
+            <p class="pricing-time">±1.5 hours service</p>
+          </div>
+          <div class="pricing-card featured">
+            <p class="pricing-cups">100 Cups</p>
+            <p class="pricing-price">R3 250*</p>
+            <p class="pricing-time">±2 hours service</p>
+          </div>
+          <div class="pricing-card">
+            <p class="pricing-cups">150 Cups</p>
+            <p class="pricing-price">R4 750</p>
+            <p class="pricing-time">±3 hours service</p>
+          </div>
+          <div class="pricing-card">
+            <p class="pricing-cups">200 Cups</p>
+            <p class="pricing-price">R6 750</p>
+            <p class="pricing-time">±4 hours service</p>
+          </div>
+        </div>
+        <p style="color: rgba(255,255,255,0.45); font-size: 0.75rem; margin-bottom: 1.25rem;">* Most popular option</p>
+        <p class="extras-note">
+          All packages include: baristas, full coffee trailer, takeaway cups & lids, and all drinks on the menu.<br>
+          <strong>Extras:</strong> Additional cups R35 each · Oat / Almond milk +R10 per cup · <strong>Travel costs R400 <em>(may vary if further than 10 km outside Stellenbosch)</em></strong>
+        </p>
+      </div>
+      <div class="event-photo">
+        <img src="Event.JPG" alt="Coffee Cruiser at an event" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <p class="section-eyebrow">Get in touch</p>
+        <h2 class="section-title">Book your event</h2>
+        <div style="margin-bottom: 1.5rem;">
+          <img src="Logo.png" alt="Coffee Cruiser Logo" style="width: 70%;" />
+        </div>
+        <p>Fill in the form and we'll get back to you as soon as possible. You can also reach us directly:</p>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          adriaanlbrink@gmail.com
+        </div>
+      </div>
+
+      <div class="booking-form">
+        <form action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="Your name" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email address</label>
+              <input type="email" id="email" name="email" placeholder="you@email.com" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="date">Event Date</label>
+              <input type="date" id="date" name="date" />
+            </div>
+            <div class="form-group">
+              <label for="cups">Number of Cups</label>
+              <select id="cups" name="cups">
+                <option value="">Choose a package</option>
+                <option value="50">50 cups; R1 650</option>
+                <option value="100">100 cups; R3 250</option>
+                <option value="150">150 cups; R4 750</option>
+                <option value="200">200 cups; R6 750</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Tell us more about your event..."></textarea>
+          </div>
+          <button type="submit" class="form-submit">Send Booking Request</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="footer-logo">Coffee Cruiser</span>
+    <span class="footer-note">© 2026 Coffee Cruiser · Handcrafted with passion</span>
+  </footer>
+
+  <script>
+    // Hide/show nav on scroll
+    const navbar = document.getElementById('navbar');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.scrollY;
+      if (currentScroll <= 10) {
+        navbar.classList.remove('hidden');
+      } else if (currentScroll > lastScroll) {
+        navbar.classList.add('hidden');
+      } else {
+        navbar.classList.remove('hidden');
+      }
+      lastScroll = currentScroll;
+    });
+
+    // Mobile menu
+    const navToggle = document.getElementById('navToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    navToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+      });
+    });
+
+    // Hero slideshow
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.slide-dot');
+    let current = 0;
+    let timer;
+
+    function goToSlide(index) {
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = index;
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+    }
+
+    function nextSlide() {
+      goToSlide((current + 1) % slides.length);
+    }
+
+    function startTimer() {
+      timer = setInterval(nextSlide, 4000);
+    }
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        clearInterval(timer);
+        goToSlide(parseInt(dot.dataset.index));
+        startTimer();
+      });
+    });
+
+    startTimer();
+  </script>
+
+</body>
+</html>
